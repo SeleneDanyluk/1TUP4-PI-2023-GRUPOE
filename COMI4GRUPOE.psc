@@ -1,5 +1,7 @@
 Algoritmo  COMI4GRUPOE
 	Definir opcionSeleccionada, cantidadDeVeterinarias, pedidosPorProducto Como Entero
+	Definir precioPorProducto Como Real
+	Dimension precioPorProducto[5]
 	Definir datosVeterinarias, productos Como Caracter
 	cantidadDeVeterinarias <- 8
 	cantidadDeProductos <- 5
@@ -18,19 +20,34 @@ Algoritmo  COMI4GRUPOE
 				Si estaCargado == Falso Entonces
 					cargarBaseDeDatosVeterinarias(datosVeterinarias)
 					cargarBaseDeDatosProductos(productos)
-					//mostrarBaseDeDatos(datosVeterinarias, cantidadDeVeterinarias)
+					cargarBaseDeDatosPrecios(precioPorProducto)
 					cargarPedidos(datosVeterinarias, pedidosPorProducto, productos, cantidadDeVeterinarias, cantidadDeProductos)
 					estaCargado<-Verdadero
 				SiNo
 					Escribir "Los pedidos del mes ya han sido cargados, si desea modificar un pedido ingrese en la opción 2."
 				FinSi
+				Limpiar Pantalla
 			2:
 				//funcion que busque los pedidos realizados segun la veterinaria seleccionada.
 			3:
+				Repetir
+					Escribir "¿Cómo desea ordenar los pedidos?"
+					Escribir "1. Por zona de conveniencia."
+					Escribir "2. Por monto de pedidos."
+					Leer orderBy 
+				Hasta Que orderBy = 1 o orderBy = 2
+				
+				Segun orderBy Hacer
+					1: ordenarVeterinariasPorZonas(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos)
+						
+					2:
+						//ordenarVeterinariasPorMontos()
+				FinSegun
+				Escribir "Los pedidos han sido ordenados exitosamente, puede verlos en la opcion 4 del menú."
 				Limpiar Pantalla
-				ordenarVeterinariasPorZonas(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3)
+				
 			4:
-				//muestra todos los pedidos del mes con sus montos totales.
+				mostrarPedidos(datosVeterinarias, pedidosPorProducto, productos)
 		Fin Segun
 	Hasta Que (opcionSeleccionada == 5 o (opcionSeleccionada<1 y opcionSeleccionada>5))
 	Limpiar Pantalla
@@ -92,46 +109,65 @@ SubProceso cargarBaseDeDatosProductos(array)
 	array[4] <- "Alimento para perros x 20 Kg."
 FinSubProceso
 
+SubProceso cargarBaseDeDatosPrecios(array)
+	array[0] <- 1000
+	array[1] <- 5500
+	array[2] <- 11500
+	array[3] <- 11500
+	array[4] <- 29900
+FinSubProceso
+
 //Subproceso que permite cargar el arreglo de los pedidos realizados
 SubProceso cargarPedidos(arrayBaseDeDatos, arrayACargar, arrayProductos, n, m)
 	Para i<-0 Hasta n-1 Hacer
 		Limpiar Pantalla
 		Para j<-0 Hasta m-1 Hacer
-			Escribir "Ingrese la cantidad pedida por: " arrayBaseDeDatos[i,0] " del producto: " arrayProductos[j]
-			Leer arrayACargar[i,j]
+			Repetir
+				Escribir "Ingrese la cantidad pedida por: " arrayBaseDeDatos[i,0] " del producto: " arrayProductos[j]
+				Leer arrayACargar[i,j]
+			Hasta Que arrayACargar[i,j] >= 0 
 		FinPara
 	FinPara
 	Escribir "¡Pedidos cargados exitosamente!"
 FinSubProceso
 
-//Ordenar array de vet, 
-SubProceso ordenarVeterinariasPorZonas(arrayDeVeterinarias, arrayDePedidos, n, m)
-	Definir aux Como Caracter;
+//Ordenar array de vet por zona. 
+SubProceso ordenarVeterinariasPorZonas(arrayDeVeterinarias, arrayDePedidos, n, m, arrayDeProductos)
+	Definir aux Como Caracter
+	Definir auxPedidos Como Entero
 	para i<-0 hasta n-2 Hacer 
 		para k<-i+1 hasta n-1 Hacer 
 			si arrayDeVeterinarias[i,2]>arrayDeVeterinarias[k,2] Entonces
+				//Ordena base de datos de veterinarias
 				Para j<-0 Hasta m-1 Hacer 
-					//ordenarPedidos()
-					//ordenarProductos()
 					aux <- arrayDeVeterinarias[i,j];
 					arrayDeVeterinarias[i,j] <- arrayDeVeterinarias[k,j]; 
 					arrayDeVeterinarias[k,j] <- aux; 
-				Fin Para
+				FinPara
+				//Ordena los productos
+				Para j<-0 Hasta 4 Hacer
+					auxPedidos <- arrayDePedidos[i,j];
+					arrayDePedidos[i,j] <- arrayDePedidos[k,j]; 
+					arrayDePedidos[k,j] <- auxPedidos; 
+				FinPara
 			FinSi
 		FinPara
 	FinPara
-	mostrarBaseDeDatos(arrayDeVeterinarias, arrayDePedidos)
 FinSubProceso
 
-SubProceso mostrarBaseDeDatos(array, arrayDePedidos)
-	Para i<-0 Hasta 7 Hacer
-		Para j<-0 Hasta 2 Hacer
+SubProceso mostrarPedidos(array, arrayDePedidos, arrayDeProductos)
+	Para i<-0 Hasta 7 Hacer //Recorre todas las filas, es decir, las veterinarias
+		Para j<-0 Hasta 2 Hacer //Recorre las columnas del arreglo de base de datos de veterinarias
+			Si j==2 Entonces
+				Escribir Sin Saltar "| Zona:" 
+			FinSi
 			Escribir Sin Saltar array[i,j], " "
 		FinPara
-		Para j<-0 Hasta 4 Hacer
-			Escribir Sin Saltar arrayDePedidos[i,j] " "
+		Escribir  " "
+		Para k<-0 Hasta 4 Hacer //Recorre las columnas del arreglo de pedidos por producto, muestra la base de datos y la cantidad pedida por producto
+			Escribir arrayDeProductos[k] " Cantidad: " arrayDePedidos[i,k] " "
 		FinPara
 		Escribir " "
+		//Muestre el total de dinero que debe abonar la veterinaria.
 	FinPara
 FinSubProceso
-	
