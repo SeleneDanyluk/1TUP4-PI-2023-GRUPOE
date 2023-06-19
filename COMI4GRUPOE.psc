@@ -6,26 +6,44 @@ Algoritmo  COMI4GRUPOE
 	Dimension datosVeterinarias[cantidadDeVeterinarias,3]
 	Dimension productos[cantidadDeProductos]
 	Dimension pedidosPorProducto[cantidadDeVeterinarias,cantidadDeProductos]
+	Definir estaCargado Como Logico
+	estaCagado<-Falso
+	mensajeBienvenida()
 	Repetir
 		menu()
 		Leer opcionSeleccionada
 		Segun opcionSeleccionada Hacer
 			1:
 				Limpiar Pantalla
-				cargarBaseDeDatosVeterinarias(datosVeterinarias)
-				cargarBaseDeDatosProductos(productos)
-				//mostrarBaseDeDatos(datosVeterinarias, cantidadDeVeterinarias)
-				cargarPedidos(datosVeterinarias, pedidosPorProducto, productos, cantidadDeVeterinarias, cantidadDeProductos)
+				Si estaCargado == Falso Entonces
+					cargarBaseDeDatosVeterinarias(datosVeterinarias)
+					cargarBaseDeDatosProductos(productos)
+					//mostrarBaseDeDatos(datosVeterinarias, cantidadDeVeterinarias)
+					cargarPedidos(datosVeterinarias, pedidosPorProducto, productos, cantidadDeVeterinarias, cantidadDeProductos)
+					estaCargado<-Verdadero
+				SiNo
+					Escribir "Los pedidos del mes ya han sido cargados, si desea modificar un pedido ingrese en la opción 2."
+				FinSi
 			2:
 				//funcion que busque los pedidos realizados segun la veterinaria seleccionada.
 			3:
-				//ordenar dependiendo la opcion ingresada
+				Limpiar Pantalla
+				ordenarVeterinariasPorZonas(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3)
 			4:
 				//muestra todos los pedidos del mes con sus montos totales.
 		Fin Segun
-	Hasta Que (opcionSeleccionada == 5 o (opcionSeleccionada>1 y opcionSeleccionada<5))
-	
+	Hasta Que (opcionSeleccionada == 5 o (opcionSeleccionada<1 y opcionSeleccionada>5))
+	Limpiar Pantalla
+	mensajeDespedida() 
 FinAlgoritmo
+
+SubProceso mensajeBienvenida()
+	Escribir "¡Bienvenidos!"
+FinSubProceso
+
+SubProceso mensajeDespedida() 
+	Escribir "Gracias por utilizar nuestro sistema."
+FinSubProceso
 
 //Subproceso menu muestra las opciones disponibles para operar dentro del programa
 SubProceso menu()
@@ -74,15 +92,6 @@ SubProceso cargarBaseDeDatosProductos(array)
 	array[4] <- "Alimento para perros x 20 Kg."
 FinSubProceso
 
-//SubProceso mostrarBaseDeDatos(array,n)
-	//Para i<-0 Hasta n-1 Hacer
-		//Para j<-0 Hasta 2 Hacer
-		//	Escribir Sin Saltar array[i,j], " "
-		//FinPara
-		//Escribir " "
-//	FinPara
-//FinSubProceso
-
 //Subproceso que permite cargar el arreglo de los pedidos realizados
 SubProceso cargarPedidos(arrayBaseDeDatos, arrayACargar, arrayProductos, n, m)
 	Para i<-0 Hasta n-1 Hacer
@@ -92,5 +101,37 @@ SubProceso cargarPedidos(arrayBaseDeDatos, arrayACargar, arrayProductos, n, m)
 			Leer arrayACargar[i,j]
 		FinPara
 	FinPara
+	Escribir "¡Pedidos cargados exitosamente!"
 FinSubProceso
 
+//Ordenar array de vet, 
+SubProceso ordenarVeterinariasPorZonas(arrayDeVeterinarias, arrayDePedidos, n, m)
+	Definir aux Como Caracter;
+	para i<-0 hasta n-2 Hacer 
+		para k<-i+1 hasta n-1 Hacer 
+			si arrayDeVeterinarias[i,2]>arrayDeVeterinarias[k,2] Entonces
+				Para j<-0 Hasta m-1 Hacer 
+					//ordenarPedidos()
+					//ordenarProductos()
+					aux <- arrayDeVeterinarias[i,j];
+					arrayDeVeterinarias[i,j] <- arrayDeVeterinarias[k,j]; 
+					arrayDeVeterinarias[k,j] <- aux; 
+				Fin Para
+			FinSi
+		FinPara
+	FinPara
+	mostrarBaseDeDatos(arrayDeVeterinarias, arrayDePedidos)
+FinSubProceso
+
+SubProceso mostrarBaseDeDatos(array, arrayDePedidos)
+	Para i<-0 Hasta 7 Hacer
+		Para j<-0 Hasta 2 Hacer
+			Escribir Sin Saltar array[i,j], " "
+		FinPara
+		Para j<-0 Hasta 4 Hacer
+			Escribir Sin Saltar arrayDePedidos[i,j] " "
+		FinPara
+		Escribir " "
+	FinPara
+FinSubProceso
+	
