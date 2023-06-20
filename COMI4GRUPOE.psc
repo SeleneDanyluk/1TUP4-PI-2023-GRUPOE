@@ -1,8 +1,10 @@
 Algoritmo  COMI4GRUPOE
-	Definir opcionSeleccionada, cantidadDeVeterinarias, pedidosPorProducto Como Entero
+	Definir opcionSeleccionada, cantidadDeVeterinarias, pedidosPorProducto, indice, opcionSubMenu Como Entero
 	Definir precioPorProducto Como Real
+	Definir montoAPagarPorVeterinaria Como Real
+	Dimension montoAPagarPorVeterinaria[8]
 	Dimension precioPorProducto[5]
-	Definir datosVeterinarias, productos Como Caracter
+	Definir datosVeterinarias, productos, veterinariaABuscar Como Caracter
 	cantidadDeVeterinarias <- 8
 	cantidadDeProductos <- 5
 	Dimension datosVeterinarias[cantidadDeVeterinarias,3]
@@ -17,18 +19,43 @@ Algoritmo  COMI4GRUPOE
 		Segun opcionSeleccionada Hacer
 			1:
 				Limpiar Pantalla
-				Si estaCargado == Falso Entonces
+				Si !estaCargado Entonces
 					cargarBaseDeDatosVeterinarias(datosVeterinarias)
 					cargarBaseDeDatosProductos(productos)
 					cargarBaseDeDatosPrecios(precioPorProducto)
 					cargarPedidos(datosVeterinarias, pedidosPorProducto, productos, cantidadDeVeterinarias, cantidadDeProductos)
+					cargarMontoAPagarPorVeterinaria(montoAPagarPorVeterinaria, cantidadDeVeterinarias, pedidosPorProducto, precioPorProducto)
 					estaCargado<-Verdadero
 				SiNo
 					Escribir "Los pedidos del mes ya han sido cargados, si desea modificar un pedido ingrese en la opción 2."
 				FinSi
 				Limpiar Pantalla
 			2:
-				//funcion que busque los pedidos realizados segun la veterinaria seleccionada.
+				
+				Repetir
+					Escribir "Ingrese la opción a ejecutar: "
+					Escribir "1. Modificar pedido."
+					Escribir "2. Ver pedido."
+					Leer opcionSubMenu
+				Hasta Que opcionSubMenu = 1 o opcionSubMenu = 2
+				
+				mostrarNombresVeterinarias(datosVeterinarias, cantidadDeVeterinarias)
+				Repetir
+					Escribir "Ingrese la veterinaria que desea buscar: "
+					Leer veterinariaABuscar
+				Hasta Que validarElementoABuscar(veterinariaABuscar, datosVeterinarias, cantidadDeVeterinarias)
+				
+				indice<-buscarVeterinaria(cantidadDeVeterinarias, datosVeterinarias, veterinariaABuscar)
+				
+				Si indice<>-1 Entonces
+					Segun opcionSubMenu
+						1: 
+							cambiarPedidoPorVeterinaria(indice, datosVeterinarias, pedidosPorProducto, productos, cantidadDeProductos)
+							cargarMontoAPagarPorVeterinaria(montoAPagarPorVeterinaria, cantidadDeVeterinarias, pedidosPorProducto, precioPorProducto)
+						2:
+							mostrarPedidoIndividual(indice, datosVeterinarias, productos, pedidosPorProducto, montoAPagarPorVeterinaria)
+					FinSegun
+				FinSi
 			3:
 				Repetir
 					Escribir "¿Cómo desea ordenar los pedidos?"
@@ -38,16 +65,16 @@ Algoritmo  COMI4GRUPOE
 				Hasta Que orderBy = 1 o orderBy = 2
 				
 				Segun orderBy Hacer
-					1: ordenarVeterinariasPorZonas(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos)
+					1: ordenarVeterinariasPorZonas(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos, montoAPagarPorVeterinaria)
 						
 					2:
-						//ordenarVeterinariasPorMontos()
+						ordenarVeterinariasPorMontos(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos, montoAPagarPorVeterinaria)
 				FinSegun
-				Escribir "Los pedidos han sido ordenados exitosamente, puede verlos en la opcion 4 del menú."
 				Limpiar Pantalla
+				Escribir "Los pedidos han sido ordenados exitosamente, puede verlos en la opcion 4 del menú."
 				
 			4:
-				mostrarPedidos(datosVeterinarias, pedidosPorProducto, productos)
+				mostrarPedidos(datosVeterinarias, pedidosPorProducto, productos, montoAPagarPorVeterinaria)
 		Fin Segun
 	Hasta Que (opcionSeleccionada == 5 o (opcionSeleccionada<1 y opcionSeleccionada>5))
 	Limpiar Pantalla
@@ -55,7 +82,7 @@ Algoritmo  COMI4GRUPOE
 FinAlgoritmo
 
 SubProceso mensajeBienvenida()
-	Escribir "¡Bienvenidos!"
+	Escribir "¡Bienvenidos a PETBIT el sistema de gestión de pedidos para distribuidoras!"
 FinSubProceso
 
 SubProceso mensajeDespedida() 
@@ -72,6 +99,7 @@ SubProceso menu()
 	Escribir "5. Salir"
 FinSubProceso
 
+//---------------------------------------------------OPCIÓN 1------------------------------------------------------
 //Subproceso que carga los datos de las veterinarias en las que el distribuidor toma pedidos.
 SubProceso cargarBaseDeDatosVeterinarias(array)
 	array[0,0]<- "Veterinaria Oeste"
@@ -131,10 +159,88 @@ SubProceso cargarPedidos(arrayBaseDeDatos, arrayACargar, arrayProductos, n, m)
 	Escribir "¡Pedidos cargados exitosamente!"
 FinSubProceso
 
+//Calcula los montos de los pedidos por cada veterinaria y los guarda en el array
+SubProceso cargarMontoAPagarPorVeterinaria(arrayMontos, n, arrayPedidos, arrayPrecios)
+	Definir acumulador como real
+	Para i<-0 Hasta n-1 Hacer
+		acumulador<-0
+		Para j<-0 Hasta 4 Hacer
+			acumulador <- acumulador + (arrayPedidos[i,j] * arrayPrecios[j])
+		FinPara
+		arrayMontos[i] <- acumulador
+	FinPara
+FinSubProceso
+
+//---------------------------------------------------OPCIÓN 2------------------------------------------------------
+Subproceso mostrarNombresVeterinarias(datosVeterinarias, n)
+	Escribir "LISTA DE VETERINARIAS:"
+	Para i<-0 Hasta n-1 Hacer
+		Escribir datosVeterinarias[i,0] 
+	FinPara
+FinSubProceso
+
+//Validacion de la cadena de veterinaria a buscar
+Funcion return<-validarElementoABuscar(veterinariaABuscar, arrayDescripcion, n)
+	Para i<-0 Hasta n-1 Hacer
+		Si arrayDescripcion[i,0] = veterinariaABuscar Entonces
+			return<-Verdadero
+		FinSi
+	FinPara
+FinFuncion
+
+//Funcion que devuelve el indice en base a la veterinaria ingresada
+Funcion return<-buscarVeterinaria(n, arrayDescripcion, veterinariaABuscar)
+	Definir i Como Entero;
+	Definir elementoEncontrado Como Logico;
+	i<-0;
+	elementoEncontrado<- Falso;
+	Mientras (no elementoEncontrado) y i<n Hacer
+		Si arrayDescripcion[i,0] == veterinariaABuscar Entonces
+			elementoEncontrado <- Verdadero
+		SiNo
+			i <- i + 1
+		FinSi
+	FinMientras
+	Si elementoEncontrado Entonces
+		return <- i
+	SiNo
+		return <- -1
+	FinSi
+FinFuncion
+
+SubProceso cambiarPedidoPorVeterinaria(i, arrayBaseDeDatos, pedidosPorProducto, arrayProductos, m)
+	Para j<-0 Hasta m-1 Hacer
+		Repetir
+			Escribir "Ingrese la cantidad pedida por: " arrayBaseDeDatos[i,0] " del producto: " arrayProductos[j]
+			Leer pedidosPorProducto[i,j]
+		Hasta Que pedidosPorProducto[i,j] >= 0 
+	FinPara
+	Escribir "El pedido se actualizó correctamente."
+FinSubProceso
+
+Subproceso mostrarPedidoIndividual(i, arrayDescripcion, arrayDeProductos, arrayDePedidos, arrayMontos)
+	Para j<-0 Hasta 2 Hacer //Recorre las columnas del arreglo de base de datos de veterinarias
+		Si j==2 Entonces
+			Escribir Sin Saltar "| Zona:" 
+		FinSi
+		Escribir Sin Saltar arrayDescripcion[i,j], " "
+	FinPara
+	Escribir  " "
+	Para k<-0 Hasta 4 Hacer //Recorre las columnas del arreglo de pedidos por producto, muestra la base de datos y la cantidad pedida por producto
+		Escribir arrayDeProductos[k] " Cantidad: " arrayDePedidos[i,k] " "
+	FinPara
+	//Muestre el total de dinero que debe abonar la veterinaria.
+	Escribir "El monto a abonar por la veterinaria es: $" arrayMontos[i]
+	Escribir " "
+FinSubProceso
+
+//---------------------------------------------------OPCIÓN 3------------------------------------------------------
+
 //Ordenar array de vet por zona. 
-SubProceso ordenarVeterinariasPorZonas(arrayDeVeterinarias, arrayDePedidos, n, m, arrayDeProductos)
+SubProceso ordenarVeterinariasPorZonas(arrayDeVeterinarias, arrayDePedidos, n, m, arrayDeProductos, arrayMontos)
 	Definir aux Como Caracter
 	Definir auxPedidos Como Entero
+	Definir auxMontos como real
 	para i<-0 hasta n-2 Hacer 
 		para k<-i+1 hasta n-1 Hacer 
 			si arrayDeVeterinarias[i,2]>arrayDeVeterinarias[k,2] Entonces
@@ -144,18 +250,55 @@ SubProceso ordenarVeterinariasPorZonas(arrayDeVeterinarias, arrayDePedidos, n, m
 					arrayDeVeterinarias[i,j] <- arrayDeVeterinarias[k,j]; 
 					arrayDeVeterinarias[k,j] <- aux; 
 				FinPara
-				//Ordena los productos
+				
 				Para j<-0 Hasta 4 Hacer
+					//Ordena los productos
 					auxPedidos <- arrayDePedidos[i,j];
 					arrayDePedidos[i,j] <- arrayDePedidos[k,j]; 
 					arrayDePedidos[k,j] <- auxPedidos; 
+					//Ordena los precios
+					auxMontos <- arrayMontos[i]
+					arrayMontos[i] <- arrayMontos[k]
+					arrayMontos[k] <- auxMontos
 				FinPara
 			FinSi
 		FinPara
 	FinPara
 FinSubProceso
 
-SubProceso mostrarPedidos(array, arrayDePedidos, arrayDeProductos)
+//Ordenamiento de las veterinarias por montos 
+SubProceso ordenarVeterinariasPorMontos(arrayDeVeterinarias, arrayDePedidos, n, m, arrayDeProductos, arrayMontos)
+	Definir aux Como Caracter
+	Definir auxPedidos Como Entero
+	Definir auxMontos como real
+	para i<-0 hasta n-2 Hacer 
+		para k<-i+1 hasta n-1 Hacer 
+			si arrayMontos[i]<arrayMontos[k] Entonces
+				//Ordena base de datos de veterinarias
+				Para j<-0 Hasta m-1 Hacer 
+					aux <- arrayDeVeterinarias[i,j];
+					arrayDeVeterinarias[i,j] <- arrayDeVeterinarias[k,j]; 
+					arrayDeVeterinarias[k,j] <- aux; 
+				FinPara
+				
+				Para j<-0 Hasta 4 Hacer
+					//Ordena los productos
+					auxPedidos <- arrayDePedidos[i,j];
+					arrayDePedidos[i,j] <- arrayDePedidos[k,j]; 
+					arrayDePedidos[k,j] <- auxPedidos; 
+					//Ordena los precios
+					auxMontos <- arrayMontos[i]
+					arrayMontos[i] <- arrayMontos[k]
+					arrayMontos[k] <- auxMontos
+				FinPara
+			FinSi
+		FinPara
+	FinPara
+FinSubProceso
+
+//---------------------------------------------------OPCIÓN 4------------------------------------------------------
+
+SubProceso mostrarPedidos(array, arrayDePedidos, arrayDeProductos, arrayMontos)
 	Para i<-0 Hasta 7 Hacer //Recorre todas las filas, es decir, las veterinarias
 		Para j<-0 Hasta 2 Hacer //Recorre las columnas del arreglo de base de datos de veterinarias
 			Si j==2 Entonces
@@ -167,7 +310,11 @@ SubProceso mostrarPedidos(array, arrayDePedidos, arrayDeProductos)
 		Para k<-0 Hasta 4 Hacer //Recorre las columnas del arreglo de pedidos por producto, muestra la base de datos y la cantidad pedida por producto
 			Escribir arrayDeProductos[k] " Cantidad: " arrayDePedidos[i,k] " "
 		FinPara
-		Escribir " "
 		//Muestre el total de dinero que debe abonar la veterinaria.
+		Escribir "El monto a abonar por la veterinaria es: $" arrayMontos[i]
+		Escribir " "
 	FinPara
 FinSubProceso
+
+
+
