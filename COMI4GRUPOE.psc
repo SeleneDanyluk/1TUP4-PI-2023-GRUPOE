@@ -38,12 +38,15 @@ Algoritmo  COMI4GRUPOE
 					Escribir "2. Ver pedido."
 					Leer opcionSubMenu
 				Hasta Que opcionSubMenu = 1 o opcionSubMenu = 2
+				Limpiar Pantalla
 				
 				mostrarNombresVeterinarias(datosVeterinarias, cantidadDeVeterinarias)
 				Repetir
 					Escribir "Ingrese la veterinaria que desea buscar: "
 					Leer veterinariaABuscar
 				Hasta Que validarElementoABuscar(veterinariaABuscar, datosVeterinarias, cantidadDeVeterinarias)
+				
+				Limpiar Pantalla
 				
 				indice<-buscarVeterinaria(cantidadDeVeterinarias, datosVeterinarias, veterinariaABuscar)
 				
@@ -57,6 +60,7 @@ Algoritmo  COMI4GRUPOE
 					FinSegun
 				FinSi
 			3:
+				Limpiar Pantalla
 				Repetir
 					Escribir "¿Cómo desea ordenar los pedidos?"
 					Escribir "1. Por zona de conveniencia."
@@ -64,9 +68,10 @@ Algoritmo  COMI4GRUPOE
 					Leer orderBy 
 				Hasta Que orderBy = 1 o orderBy = 2
 				
+				Limpiar Pantalla
 				Segun orderBy Hacer
-					1: ordenarVeterinariasPorZonas(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos, montoAPagarPorVeterinaria)
-						
+					1: 
+						ordenarVeterinariasPorZonas(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos, montoAPagarPorVeterinaria)
 					2:
 						ordenarVeterinariasPorMontos(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos, montoAPagarPorVeterinaria)
 				FinSegun
@@ -74,9 +79,14 @@ Algoritmo  COMI4GRUPOE
 				Escribir "Los pedidos han sido ordenados exitosamente, puede verlos en la opcion 4 del menú."
 				
 			4:
+				Limpiar Pantalla
 				mostrarPedidos(datosVeterinarias, pedidosPorProducto, productos, montoAPagarPorVeterinaria)
+				
+			5: 
+				Limpiar Pantalla
+				mostrarResumenMesual(montoAPagarPorVeterinaria, cantidadDeVeterinarias, cantidadDeProductos, productos, pedidosPorProducto)
 		Fin Segun
-	Hasta Que (opcionSeleccionada == 5 o (opcionSeleccionada<1 y opcionSeleccionada>5))
+	Hasta Que (opcionSeleccionada == 6 o (opcionSeleccionada<1 y opcionSeleccionada>6))
 	Limpiar Pantalla
 	mensajeDespedida() 
 FinAlgoritmo
@@ -96,7 +106,8 @@ SubProceso menu()
 	Escribir "2. Buscar un pedido"
 	Escribir "3. Ordenar por zona de conveniencia o por montos de pedidos"
 	Escribir "4. Mostrar pedidos del mes"
-	Escribir "5. Salir"
+	Escribir "5. Resumenes del mes."
+	Escribir "6. Salir"
 FinSubProceso
 
 //---------------------------------------------------OPCIÓN 1------------------------------------------------------
@@ -137,6 +148,7 @@ SubProceso cargarBaseDeDatosProductos(array)
 	array[4] <- "Alimento para perros x 20 Kg."
 FinSubProceso
 
+//Subproceso que carga los precios de cada producto
 SubProceso cargarBaseDeDatosPrecios(array)
 	array[0] <- 1000
 	array[1] <- 5500
@@ -159,7 +171,7 @@ SubProceso cargarPedidos(arrayBaseDeDatos, arrayACargar, arrayProductos, n, m)
 	Escribir "¡Pedidos cargados exitosamente!"
 FinSubProceso
 
-//Calcula los montos de los pedidos por cada veterinaria y los guarda en el array
+//Calcula los montos de los pedidos por cada veterinaria y los guarda en el arreglo
 SubProceso cargarMontoAPagarPorVeterinaria(arrayMontos, n, arrayPedidos, arrayPrecios)
 	Definir acumulador como real
 	Para i<-0 Hasta n-1 Hacer
@@ -316,5 +328,35 @@ SubProceso mostrarPedidos(array, arrayDePedidos, arrayDeProductos, arrayMontos)
 	FinPara
 FinSubProceso
 
+//---------------------------------------------------OPCIÓN 5------------------------------------------------------
 
+SubProceso mostrarResumenMesual(arrayMontos, n, m, arrayProductos, arrayPedidos)
+	Definir montoTotal Como Real
+	montoTotal <- calcularMontoTotal(arrayMontos, n)
+	Escribir "RESUMEN MENSUAL: "
+	Escribir "TOTAL A RECAUDAR: $" montoTotal
+	Escribir "CANTIDAD POR PRODUCTO: "	
+	mostrarCantidadPorProducto( m, arrayProductos, arrayPedidos, n)
+FinSubProceso
 
+Funcion return<-calcularMontoTotal(arrayMontos, n)
+	Definir acumulador Como Real
+	acumulador<-0
+	Para i<-0 Hasta n-1 Hacer
+		acumulador <- acumulador + arrayMontos[i]
+	FinPara
+	return<-acumulador
+FinFuncion
+
+SubProceso mostrarCantidadPorProducto( m, arrayProductos, arrayPedidos, n)
+	Definir cantidadTotalPorProducto Como Entero
+	Para i<-0 Hasta m-1 Hacer //Itera columnas de cada producto
+		cantidadTotalPorProducto<-0
+		Para j<-0 Hasta n-1 Hacer //itera filas de cada veterinaria
+			cantidadTotalPorProducto <- cantidadTotalPorProducto + arrayPedidos[j,i]
+		FinPara
+		Escribir "Cantidad pedida de: " arrayProductos[i] " es: " cantidadTotalPorProducto
+	FinPara
+	Escribir "---------------------------------------------------------"
+FinSubProceso
+	
