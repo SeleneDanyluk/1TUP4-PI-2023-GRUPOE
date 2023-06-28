@@ -195,22 +195,30 @@ FinSubProceso
 
 //Subproceso que permite cargar el arreglo de los pedidos realizados
 SubProceso cargarPedidos(arrayBaseDeDatos, arrayACargar, arrayProductos, n, m)
-    Definir aux Como Real
-    Para i<-0 Hasta n-1 Hacer
-        Limpiar Pantalla
-        Para j<-0 Hasta m-1 Hacer
-            Repetir
-                Escribir "Ingrese la cantidad pedida por: " arrayBaseDeDatos[i,0] " del producto: " arrayProductos[j]
-                Leer aux
-                Si aux < 0 
-                    Escribir "Cantidad inválida"
-                SiNo
-                    ArrayACargar[i,j] <- aux
-                FinSi
-            Mientras que aux < 0
-        FinPara
-    FinPara
-    Escribir "¡Pedidos cargados exitosamente!"
+	Definir auxiliarCadena Como Caracter
+	Definir esCadenaValida, auxiliarEntero Como Entero
+	Para i<-0 Hasta n-1 Hacer
+		Limpiar Pantalla
+		Para j<-0 Hasta m-1 Hacer
+			esCadenaValida <- 0
+			Repetir
+				Escribir "Ingrese la cantidad pedida por: " arrayBaseDeDatos[i,0] " del producto: " arrayProductos[j]
+				Leer auxiliarCadena 
+				Si (Longitud(auxiliarCadena) <> 0 y auxiliarCadena <> " ") Entonces
+					auxiliarEntero <- ConvertirANumero(auxiliarCadena)
+					Si auxiliarEntero >= 0 Entonces
+						esCadenaValida <- 1
+					SiNo
+						Escribir "Cantidad incorrecta."
+					FinSi
+				SiNo
+					Escribir "Cantidad incorrecta."
+				FinSi
+			Mientras que (esCadenaValida == 0)
+			ArrayACargar[i,j] <- auxiliarEntero
+		FinPara
+	FinPara
+	Escribir "¡Pedidos cargados exitosamente!"
 FinSubProceso
 
 //Calcula los montos de los pedidos por cada veterinaria y los guarda en el arreglo
