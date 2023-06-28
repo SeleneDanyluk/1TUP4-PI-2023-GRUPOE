@@ -12,18 +12,25 @@ Algoritmo  COMI4GRUPOE
 	Dimension pedidosPorProducto[cantidadDeVeterinarias,cantidadDeProductos]
 	Definir estaCargado Como Logico
 	estaCagado<-Falso
+	Definir esPrimeraVez Como Logico
+	esPrimeraVez<-Verdadero
 	mensajeBienvenida()
 	Repetir
 		menu()
 		Leer opcionSeleccionada
 		Segun opcionSeleccionada Hacer
 			1:
+				esPrimeraVez<-Falso
 				Limpiar Pantalla
 				Si !estaCargado Entonces
 					cargarBaseDeDatosVeterinarias(datosVeterinarias)
 					cargarBaseDeDatosProductos(productos)
 					cargarBaseDeDatosPrecios(precioPorProducto)
-					cargarPedidos(datosVeterinarias, pedidosPorProducto, productos, cantidadDeVeterinarias, cantidadDeProductos)
+					//cargarPedidos(datosVeterinarias, pedidosPorProducto, productos, cantidadDeVeterinarias, cantidadDeProductos)
+					
+					//Esta función solo se ejecutará en el momento en el que se esté testeando el programa, sino estará comentada tanto el llamado como su código.
+					cargarModoDesarrollador(pedidosPorProducto)
+					
 					cargarMontoAPagarPorVeterinaria(montoAPagarPorVeterinaria, cantidadDeVeterinarias, pedidosPorProducto, precioPorProducto)
 					estaCargado<-Verdadero
 				SiNo
@@ -31,66 +38,86 @@ Algoritmo  COMI4GRUPOE
 				FinSi
 				Limpiar Pantalla
 			2:
-				
-				Repetir
-					Escribir "Ingrese la opción a ejecutar: "
-					Escribir "1. Modificar pedido."
-					Escribir "2. Ver pedido."
-					Leer opcionSubMenu
-				Hasta Que opcionSubMenu = 1 o opcionSubMenu = 2
-				Limpiar Pantalla
-				
-				mostrarNombresVeterinarias(datosVeterinarias, cantidadDeVeterinarias)
-				Repetir
-					Escribir "Ingrese la veterinaria que desea buscar: "
-					Leer veterinariaABuscar
-				Hasta Que validarElementoABuscar(veterinariaABuscar, datosVeterinarias, cantidadDeVeterinarias)
-				
-				Limpiar Pantalla
-				
-				indice<-buscarVeterinaria(cantidadDeVeterinarias, datosVeterinarias, veterinariaABuscar)
-				
-				Si indice<>-1 Entonces
-					Segun opcionSubMenu
-						1: 
-							cambiarPedidoPorVeterinaria(indice, datosVeterinarias, pedidosPorProducto, productos, cantidadDeProductos)
-							cargarMontoAPagarPorVeterinaria(montoAPagarPorVeterinaria, cantidadDeVeterinarias, pedidosPorProducto, precioPorProducto)
-						2:
-							mostrarPedidoIndividual(indice, datosVeterinarias, productos, pedidosPorProducto, montoAPagarPorVeterinaria)
-					FinSegun
+				Si esPrimeraVez Entonces
+					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE EJECUTAR LA OPCIÓN 1."
+				SiNo
+					Repetir
+						Escribir "Ingrese la opción a ejecutar: "
+						Escribir "1. Modificar pedido."
+						Escribir "2. Ver pedido."
+						Leer opcionSubMenu
+					Hasta Que opcionSubMenu = 1 o opcionSubMenu = 2
+					Limpiar Pantalla
+					
+					mostrarNombresVeterinarias(datosVeterinarias, cantidadDeVeterinarias)
+					Repetir
+						Escribir "Ingrese la veterinaria que desea buscar: "
+						Leer veterinariaABuscar
+					Hasta Que validarElementoABuscar(veterinariaABuscar, datosVeterinarias, cantidadDeVeterinarias)
+					
+					
+					Limpiar Pantalla
+					
+					indice<-buscarVeterinaria(cantidadDeVeterinarias, datosVeterinarias, veterinariaABuscar)
+					
+					Si indice<>-1 Entonces
+						Segun opcionSubMenu
+							1: 
+								cambiarPedidoPorVeterinaria(indice, datosVeterinarias, pedidosPorProducto, productos, cantidadDeProductos)
+								cargarMontoAPagarPorVeterinaria(montoAPagarPorVeterinaria, cantidadDeVeterinarias, pedidosPorProducto, precioPorProducto)
+							2:
+								mostrarPedidoIndividual(indice, datosVeterinarias, productos, pedidosPorProducto, montoAPagarPorVeterinaria)
+						FinSegun
+					FinSi
 				FinSi
-			3:
-				Limpiar Pantalla
-				Repetir
-					Escribir "¿Cómo desea ordenar los pedidos?"
-					Escribir "1. Por zona de conveniencia."
-					Escribir "2. Por monto de pedidos."
-					Leer orderBy 
-				Hasta Que orderBy = 1 o orderBy = 2
 				
-				Limpiar Pantalla
-				Segun orderBy Hacer
-					1: 
-						ordenarVeterinariasPorZonas(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos, montoAPagarPorVeterinaria)
-					2:
-						ordenarVeterinariasPorMontos(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos, montoAPagarPorVeterinaria)
-				FinSegun
-				Limpiar Pantalla
-				Escribir "Los pedidos han sido ordenados exitosamente, puede verlos en la opcion 4 del menú."
+			3:
+				Si esPrimeraVez Entonces
+					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE EJECUTAR LA OPCIÓN 1."
+				SiNo 
+					Limpiar Pantalla
+					Repetir
+						Escribir "¿Cómo desea ordenar los pedidos?"
+						Escribir "1. Por zona de conveniencia."
+						Escribir "2. Por monto de pedidos."
+						Leer orderBy 
+					Hasta Que orderBy = 1 o orderBy = 2
+					
+					Limpiar Pantalla
+					Segun orderBy Hacer
+						1: 
+							ordenarVeterinariasPorZonas(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos, montoAPagarPorVeterinaria)
+						2:
+							ordenarVeterinariasPorMontos(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos, montoAPagarPorVeterinaria)
+					FinSegun
+					Limpiar Pantalla
+					Escribir "Los pedidos han sido ordenados exitosamente, puede verlos en la opcion 4 del menú."
+				FinSi
 				
 			4:
+				
 				Limpiar Pantalla
-				mostrarPedidos(datosVeterinarias, pedidosPorProducto, productos, montoAPagarPorVeterinaria)
+				Si esPrimeraVez Entonces
+					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE EJECUTAR LA OPCIÓN 1."
+				SiNo
+					mostrarPedidos(datosVeterinarias, pedidosPorProducto, productos, montoAPagarPorVeterinaria)
+				FinSi
 				
 			5: 
 				Limpiar Pantalla
-				mostrarResumenMesual(montoAPagarPorVeterinaria, cantidadDeVeterinarias, cantidadDeProductos, productos, pedidosPorProducto)
+				Si esPrimeraVez Entonces
+					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE EJECUTAR LA OPCIÓN 1."
+				SiNo
+					mostrarResumenMesual(montoAPagarPorVeterinaria, cantidadDeVeterinarias, cantidadDeProductos, productos, pedidosPorProducto)
+				FinSi
+				
 		Fin Segun
 	Hasta Que (opcionSeleccionada == 6 o (opcionSeleccionada<1 y opcionSeleccionada>6))
 	Limpiar Pantalla
 	mensajeDespedida() 
 FinAlgoritmo
 
+//---------------------------------------------------INICIO------------------------------------------------------
 SubProceso mensajeBienvenida()
 	Escribir "¡Bienvenidos a PETBIT el sistema de gestión de pedidos para distribuidoras!"
 FinSubProceso
@@ -159,17 +186,24 @@ FinSubProceso
 
 //Subproceso que permite cargar el arreglo de los pedidos realizados
 SubProceso cargarPedidos(arrayBaseDeDatos, arrayACargar, arrayProductos, n, m)
+	Definir aux Como Real
 	Para i<-0 Hasta n-1 Hacer
 		Limpiar Pantalla
 		Para j<-0 Hasta m-1 Hacer
 			Repetir
 				Escribir "Ingrese la cantidad pedida por: " arrayBaseDeDatos[i,0] " del producto: " arrayProductos[j]
-				Leer arrayACargar[i,j]
-			Hasta Que arrayACargar[i,j] >= 0 
+				Leer aux
+				Si aux < 0 o (Longitud(ConvertirATexto(aux)) = 0)
+					Escribir "Cantidad inválida."
+				SiNo
+					ArrayACargar[i,j] <- aux
+				FinSi
+			Mientras que aux < 0 o (Longitud(ConvertirATexto(aux)) = 0)
 		FinPara
 	FinPara
 	Escribir "¡Pedidos cargados exitosamente!"
 FinSubProceso
+
 
 //Calcula los montos de los pedidos por cada veterinaria y los guarda en el arreglo
 SubProceso cargarMontoAPagarPorVeterinaria(arrayMontos, n, arrayPedidos, arrayPrecios)
@@ -220,13 +254,47 @@ Funcion return<-buscarVeterinaria(n, arrayDescripcion, veterinariaABuscar)
 	FinSi
 FinFuncion
 
-SubProceso cambiarPedidoPorVeterinaria(i, arrayBaseDeDatos, pedidosPorProducto, arrayProductos, m)
-	Para j<-0 Hasta m-1 Hacer
-		Repetir
-			Escribir "Ingrese la cantidad pedida por: " arrayBaseDeDatos[i,0] " del producto: " arrayProductos[j]
-			Leer pedidosPorProducto[i,j]
-		Hasta Que pedidosPorProducto[i,j] >= 0 
+SubProceso mostrarProductosDisponibles(arrayProductos, m)
+	Escribir "LISTA DE PRODUCTOS: "
+	Para i<-0 Hasta m-1 Hacer
+		Escribir arrayProductos[i]
 	FinPara
+FinSubProceso
+
+Funcion return<-validarProductoIngresado(arrayProductos, productoIngresado, m)
+	Para i<-0 Hasta m-1 Hacer
+		Si arrayProductos[i] == productoIngresado Entonces
+			return<-Verdadero
+		FinSi
+	FinPara
+FinFuncion
+
+Funcion return<-buscarProductoAModificar(arrayProductos, m)
+	Definir productoAModificar Como Caracter
+	mostrarProductosDisponibles(arrayProductos, m) 
+	Repetir
+		Escribir Sin Saltar "Ingrese el producto al que desea modificar el stock: "
+		Leer productoAModificar
+	Hasta Que validarProductoIngresado(arrayProductos, productoAModificar, m)
+	
+	Para i<-0 Hasta m-1 Hacer
+		Si arrayProductos[i] == productoAModificar Entonces
+			return<-i
+		FinSi
+	FinPara
+FinFuncion
+
+SubProceso cambiarPedidoPorVeterinaria(i, arrayBaseDeDatos, pedidosPorProducto, arrayProductos, m)
+	Definir indice como Entero
+	indice<-buscarProductoAModificar(arrayProductos, m)
+	
+	Limpiar Pantalla
+	
+	Repetir
+		Escribir "Ingrese la cantidad pedida por: " arrayBaseDeDatos[i,0] " del producto: " arrayProductos[indice]
+		Leer pedidosPorProducto[i,indice]
+	Hasta Que pedidosPorProducto[i,indice] >= 0 
+	
 	Escribir "El pedido se actualizó correctamente."
 FinSubProceso
 
@@ -358,5 +426,50 @@ SubProceso mostrarCantidadPorProducto( m, arrayProductos, arrayPedidos, n)
 		Escribir "Cantidad pedida de: " arrayProductos[i] " es: " cantidadTotalPorProducto
 	FinPara
 	Escribir "---------------------------------------------------------"
+FinSubProceso
+
+//---------------------------------------------------SOLO PARA TESTEO DEL PROGRAMA------------------------------------------------------
+
+SubProceso cargarModoDesarrollador(arrayACargar)
+	arrayACargar[0,0] <- 1 
+	arrayACargar[0,1] <- 1
+	arrayACargar[0,2] <- 1
+	arrayACargar[0,3] <- 1
+	arrayACargar[0,4] <- 1
+	arrayACargar[1,0] <- 2
+	arrayACargar[1,1] <- 2
+	arrayACargar[1,2] <- 2
+	arrayACargar[1,3] <- 2
+	arrayACargar[1,4] <- 2
+	arrayACargar[2,0] <- 3
+	arrayACargar[2,1] <- 3
+	arrayACargar[2,2] <- 3
+	arrayACargar[2,3] <- 3
+	arrayACargar[2,4] <- 3
+	arrayACargar[3,0] <- 4
+	arrayACargar[3,1] <- 4
+	arrayACargar[3,2] <- 4
+	arrayACargar[3,3] <- 4
+	arrayACargar[3,4] <- 4
+	arrayACargar[4,0] <- 5
+	arrayACargar[4,1] <- 5
+	arrayACargar[4,2] <- 5
+	arrayACargar[4,3] <- 5
+	arrayACargar[4,4] <- 5
+	arrayACargar[5,0] <- 6
+	arrayACargar[5,1] <- 6
+	arrayACargar[5,2] <- 6
+	arrayACargar[5,3] <- 6
+	arrayACargar[5,4] <- 6
+	arrayACargar[6,0] <- 7
+	arrayACargar[6,1] <- 7
+	arrayACargar[6,2] <- 7
+	arrayACargar[6,3] <- 7
+	arrayACargar[6,4] <- 7
+	arrayACargar[7,0] <- 8
+	arrayACargar[7,1] <- 8
+	arrayACargar[7,2] <- 8
+	arrayACargar[7,3] <- 8
+	arrayACargar[7,4] <- 8
 FinSubProceso
 	
