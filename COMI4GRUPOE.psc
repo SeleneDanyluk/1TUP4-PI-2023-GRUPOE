@@ -1,10 +1,10 @@
 Algoritmo  COMI4GRUPOE
-	Definir opcionSeleccionada, cantidadDeVeterinarias, pedidosPorProducto, indice, opcionSubMenu Como Entero
+	Definir cantidadDeVeterinarias, pedidosPorProducto, indice, opcionSubMenu Como Entero
 	Definir precioPorProducto Como Real
 	Definir montoAPagarPorVeterinaria Como Real
 	Dimension montoAPagarPorVeterinaria[8]
 	Dimension precioPorProducto[5]
-	Definir datosVeterinarias, productos, veterinariaABuscar Como Caracter
+	Definir opcionSeleccionada,datosVeterinarias, productos, veterinariaABuscar Como Caracter
 	cantidadDeVeterinarias <- 8
 	cantidadDeProductos <- 5
 	Dimension datosVeterinarias[cantidadDeVeterinarias,3]
@@ -14,22 +14,23 @@ Algoritmo  COMI4GRUPOE
 	estaCagado<-Falso
 	Definir esPrimeraVez Como Logico
 	esPrimeraVez<-Verdadero
+	
 	mensajeBienvenida()
+	
 	Repetir
-		menu()
-		Leer opcionSeleccionada
+		opcionSeleccionada <- menu()
 		Segun opcionSeleccionada Hacer
-			1:
+			"CARGAR PEDIDOS":
 				esPrimeraVez<-Falso
 				Limpiar Pantalla
 				Si !estaCargado Entonces
 					cargarBaseDeDatosVeterinarias(datosVeterinarias)
 					cargarBaseDeDatosProductos(productos)
 					cargarBaseDeDatosPrecios(precioPorProducto)
-					//cargarPedidos(datosVeterinarias, pedidosPorProducto, productos, cantidadDeVeterinarias, cantidadDeProductos)
+					cargarPedidos(datosVeterinarias, pedidosPorProducto, productos, cantidadDeVeterinarias, cantidadDeProductos)
 					
-					//Esta función solo se ejecutará en el momento en el que se esté testeando el programa, sino estará comentada tanto el llamado como su código.
-					cargarModoDesarrollador(pedidosPorProducto)
+					//Descomentar para realizar una DEMO del programa
+					//cargarDEMO(pedidosPorProducto)
 					
 					cargarMontoAPagarPorVeterinaria(montoAPagarPorVeterinaria, cantidadDeVeterinarias, pedidosPorProducto, precioPorProducto)
 					estaCargado<-Verdadero
@@ -37,9 +38,9 @@ Algoritmo  COMI4GRUPOE
 					Escribir "Los pedidos del mes ya han sido cargados, si desea modificar un pedido ingrese en la opción 2."
 				FinSi
 				Limpiar Pantalla
-			2:
+			"BUSCAR UN PEDIDO":
 				Si esPrimeraVez Entonces
-					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE EJECUTAR LA OPCIÓN 1."
+					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE CARGAR LOS PEDIDOS."
 				SiNo
 					Repetir
 						Escribir "Ingrese la opción a ejecutar: "
@@ -54,7 +55,6 @@ Algoritmo  COMI4GRUPOE
 						Escribir "Ingrese la veterinaria que desea buscar: "
 						Leer veterinariaABuscar
 					Hasta Que validarElementoABuscar(veterinariaABuscar, datosVeterinarias, cantidadDeVeterinarias)
-					
 					
 					Limpiar Pantalla
 					
@@ -71,9 +71,9 @@ Algoritmo  COMI4GRUPOE
 					FinSi
 				FinSi
 				
-			3:
+			"ORDENAR POR":
 				Si esPrimeraVez Entonces
-					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE EJECUTAR LA OPCIÓN 1."
+					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE CARGAR LOS PEDIDOS."
 				SiNo 
 					Limpiar Pantalla
 					Repetir
@@ -91,28 +91,27 @@ Algoritmo  COMI4GRUPOE
 							ordenarVeterinariasPorMontos(datosVeterinarias, pedidosPorProducto, cantidadDeVeterinarias, 3, productos, montoAPagarPorVeterinaria)
 					FinSegun
 					Limpiar Pantalla
-					Escribir "Los pedidos han sido ordenados exitosamente, puede verlos en la opcion 4 del menú."
+					Escribir "Los pedidos han sido ordenados exitosamente, podrá verlos en los informes del mes"
 				FinSi
 				
-			4:
+			"MOSTRAR PEDIDOS DEL MES":
 				
 				Limpiar Pantalla
 				Si esPrimeraVez Entonces
-					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE EJECUTAR LA OPCIÓN 1."
+					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE CARGAR LOS PEDIDOS."
 				SiNo
 					mostrarPedidos(datosVeterinarias, pedidosPorProducto, productos, montoAPagarPorVeterinaria)
 				FinSi
 				
-			5: 
+			"RESUMENES DEL MES": 
 				Limpiar Pantalla
 				Si esPrimeraVez Entonces
-					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE EJECUTAR LA OPCIÓN 1."
+					Escribir "ATENCION! PARA PODER CONTINUAR, DEBE CARGAR LOS PEDIDOS."
 				SiNo
 					mostrarResumenMesual(montoAPagarPorVeterinaria, cantidadDeVeterinarias, cantidadDeProductos, productos, pedidosPorProducto)
 				FinSi
-				
 		Fin Segun
-	Hasta Que (opcionSeleccionada == 6 o (opcionSeleccionada<1 y opcionSeleccionada>6))
+	Mientras Que opcionSeleccionada <> "SALIR"
 	Limpiar Pantalla
 	mensajeDespedida() 
 FinAlgoritmo
@@ -127,15 +126,25 @@ SubProceso mensajeDespedida()
 FinSubProceso
 
 //Subproceso menu muestra las opciones disponibles para operar dentro del programa
-SubProceso menu()
+Funcion return <- menu()
+	Definir opcMenu Como Cadena
+	Repetir
 	Escribir "MENÚ DE OPCIONES"
-	Escribir "1. Cargar los pedidos realizados"
-	Escribir "2. Buscar un pedido"
-	Escribir "3. Ordenar por zona de conveniencia o por montos de pedidos"
-	Escribir "4. Mostrar pedidos del mes"
-	Escribir "5. Resumenes del mes."
-	Escribir "6. Salir"
-FinSubProceso
+	Escribir ">Cargar pedidos"
+	Escribir ">Buscar un pedido"
+	Escribir ">Ordenar por"
+	Escribir ">Mostrar pedidos del mes"
+	Escribir ">Resumenes del mes"
+	Escribir ">Salir"
+	Leer opcMenu
+	opcMenu <- Mayusculas(opcMenu)
+	si no(opcMenu == "CARGAR PEDIDOS" o  opcMenu == "BUSCAR UN PEDIDO" o  opcMenu == "ORDENAR POR" o  opcMenu == "MOSTRAR PEDIDOS DEL MES" o  opcMenu == "RESUMENES DEL MES" o  opcMenu == "SALIR")
+		Escribir "La opción ingresada es incorrecta"
+	FinSi
+	Hasta Que opcMenu == "CARGAR PEDIDOS" o  opcMenu == "BUSCAR UN PEDIDO" o  opcMenu == "ORDENAR POR" o  opcMenu == "MOSTRAR PEDIDOS DEL MES" o  opcMenu == "RESUMENES DEL MES" o  opcMenu == "SALIR"
+	return <- opcMenu
+	Limpiar Pantalla
+FinFuncion
 
 //---------------------------------------------------OPCIÓN 1------------------------------------------------------
 //Subproceso que carga los datos de las veterinarias en las que el distribuidor toma pedidos.
@@ -168,11 +177,11 @@ FinSubProceso
 
 //Subproceso que carga los productos que el distrubuidor ofrece
 SubProceso cargarBaseDeDatosProductos(array)
-	array[0] <- "Alimento para gatos x 1/2 Kg."
-	array[1] <- "Alimento para gatos x 3 Kg."
-	array[2] <- "Alimento para gatos x 7 Kg."
-	array[3] <- "Alimento para perros x 7 Kg."
-	array[4] <- "Alimento para perros x 20 Kg."
+	array[0] <- "Alimento para gatos x 1/2Kg"
+	array[1] <- "Alimento para gatos x 3Kg"
+	array[2] <- "Alimento para gatos x 7Kg"
+	array[3] <- "Alimento para perros x 7Kg"
+	array[4] <- "Alimento para perros x 20Kg"
 FinSubProceso
 
 //Subproceso que carga los precios de cada producto
@@ -186,24 +195,23 @@ FinSubProceso
 
 //Subproceso que permite cargar el arreglo de los pedidos realizados
 SubProceso cargarPedidos(arrayBaseDeDatos, arrayACargar, arrayProductos, n, m)
-	Definir aux Como Real
-	Para i<-0 Hasta n-1 Hacer
-		Limpiar Pantalla
-		Para j<-0 Hasta m-1 Hacer
-			Repetir
-				Escribir "Ingrese la cantidad pedida por: " arrayBaseDeDatos[i,0] " del producto: " arrayProductos[j]
-				Leer aux
-				Si aux < 0 o (Longitud(ConvertirATexto(aux)) = 0)
-					Escribir "Cantidad inválida."
-				SiNo
-					ArrayACargar[i,j] <- aux
-				FinSi
-			Mientras que aux < 0 o (Longitud(ConvertirATexto(aux)) = 0)
-		FinPara
-	FinPara
-	Escribir "¡Pedidos cargados exitosamente!"
+    Definir aux Como Real
+    Para i<-0 Hasta n-1 Hacer
+        Limpiar Pantalla
+        Para j<-0 Hasta m-1 Hacer
+            Repetir
+                Escribir "Ingrese la cantidad pedida por: " arrayBaseDeDatos[i,0] " del producto: " arrayProductos[j]
+                Leer aux
+                Si aux < 0 
+                    Escribir "Cantidad inválida"
+                SiNo
+                    ArrayACargar[i,j] <- aux
+                FinSi
+            Mientras que aux < 0
+        FinPara
+    FinPara
+    Escribir "¡Pedidos cargados exitosamente!"
 FinSubProceso
-
 
 //Calcula los montos de los pedidos por cada veterinaria y los guarda en el arreglo
 SubProceso cargarMontoAPagarPorVeterinaria(arrayMontos, n, arrayPedidos, arrayPrecios)
@@ -228,7 +236,7 @@ FinSubProceso
 //Validacion de la cadena de veterinaria a buscar
 Funcion return<-validarElementoABuscar(veterinariaABuscar, arrayDescripcion, n)
 	Para i<-0 Hasta n-1 Hacer
-		Si arrayDescripcion[i,0] = veterinariaABuscar Entonces
+		Si Mayusculas(arrayDescripcion[i,0]) = Mayusculas(veterinariaABuscar) Entonces
 			return<-Verdadero
 		FinSi
 	FinPara
@@ -241,7 +249,7 @@ Funcion return<-buscarVeterinaria(n, arrayDescripcion, veterinariaABuscar)
 	i<-0;
 	elementoEncontrado<- Falso;
 	Mientras (no elementoEncontrado) y i<n Hacer
-		Si arrayDescripcion[i,0] == veterinariaABuscar Entonces
+		Si Mayusculas(arrayDescripcion[i,0]) == Mayusculas(veterinariaABuscar) Entonces
 			elementoEncontrado <- Verdadero
 		SiNo
 			i <- i + 1
@@ -263,7 +271,7 @@ FinSubProceso
 
 Funcion return<-validarProductoIngresado(arrayProductos, productoIngresado, m)
 	Para i<-0 Hasta m-1 Hacer
-		Si arrayProductos[i] == productoIngresado Entonces
+		Si Mayusculas(arrayProductos[i]) == Mayusculas(productoIngresado) Entonces
 			return<-Verdadero
 		FinSi
 	FinPara
@@ -278,7 +286,7 @@ Funcion return<-buscarProductoAModificar(arrayProductos, m)
 	Hasta Que validarProductoIngresado(arrayProductos, productoAModificar, m)
 	
 	Para i<-0 Hasta m-1 Hacer
-		Si arrayProductos[i] == productoAModificar Entonces
+		Si Mayusculas(arrayProductos[i]) == Mayusculas(productoAModificar) Entonces
 			return<-i
 		FinSi
 	FinPara
@@ -430,7 +438,7 @@ FinSubProceso
 
 //---------------------------------------------------SOLO PARA TESTEO DEL PROGRAMA------------------------------------------------------
 
-SubProceso cargarModoDesarrollador(arrayACargar)
+SubProceso cargarDEMO(arrayACargar)
 	arrayACargar[0,0] <- 1 
 	arrayACargar[0,1] <- 1
 	arrayACargar[0,2] <- 1
